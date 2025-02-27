@@ -49,7 +49,7 @@ requirements.txt
 1. **Clone o repositório**:
    
    git clone https://github.com/BlackSouza1337/ticket_manager_simples/
-   cd nome-do-repositorio
+   cd ticket_manager_simples
 
 2. Instale as dependências:
     pip install -r requirements.txt
