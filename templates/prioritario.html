@@ -95,6 +95,9 @@
                                 {% if current_user.role == 'admin' %}
                                     <a href="{{ url_for('editar_ticket_prioritario', id=ticket[0]) }}" class="btn-editar">Editar</a>
                                 {% endif %}
+                                {% if current_user.role in ['user', 'DIRETORIA'] %}
+                                    <a href="{{ url_for('editar_ticket_prioritario', id=ticket[0]) }}" class="btn-editar">Visualizar</a>
+                                {% endif %}
                             </td>
                             <td>
                                 {% if current_user.role == 'admin' and not ticket[9] %}
