@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterar Senha</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/LOGO.PNG') }}" alt="Logo da Empresa" class="logo-img">
+            <h1>Gerenciador de Tickets</h1>
+        </div>
+        <nav>
+            <ul>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Tickets Gerais</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('index') }}">Página Inicial</a>
+                        <a href="{{ url_for('abrir_ticket', origem='index') }}">Criar Ticket</a>
+                        <a href="{{ url_for('tickets_resolvidos') }}">Tickets Resolvidos</a>
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('gerenciar_usuarios') }}">Gerenciar Usuários</a>
+                        {% endif %}
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Tickets Prioritários</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('abrir_ticket', origem='prioritario') }}">Criar Ticket Prioritário</a>
+                        <a href="{{ url_for('prioritario') }}">Tickets Prioritários</a>
+                        <a href="{{ url_for('tickets_resolvidos_prioritario') }}">Tickets Resolvidos Prioritários</a>
+                    </div>
+                </li>
+                <li class="user-info dropdown">
+                    <a href="#" class="dropbtn">{{ current_user.username }}</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('alterar_senha') }}">Criar Nova Senha</a>
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Alterar Senha</h1>
+
+        <!-- Mensagens de flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulário de Alteração de Senha -->
+        <form action="{{ url_for('alterar_senha') }}" method="POST" class="user-form">
+            <div class="form-group">
+                <label for="nova_senha">Nova Senha:</label>
+                <input type="password" id="nova_senha" name="nova_senha" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmar_senha">Confirmar Nova Senha:</label>
+                <input type="password" id="confirmar_senha" name="confirmar_senha" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Alterar Senha</button>
+        </form>
+
+        <!-- Botão Voltar -->
+        <a href="{{ url_for('index') }}" class="btn-voltar">Voltar para a página inicial</a>
+    </main>
+
+    <footer>
+    <p>&copy; 2025 Gerenciador de Tickets. Desenvolvido por 
+        <a href="https://github.com/BlackSouza1337" target="_blank" style="text-decoration: none; color: inherit;">
+            BlackSouza1337
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="16" height="16" style="vertical-align: middle; margin-left: 5px;">
+        </a>
+    </p>
+</footer>
+</body>
+</html>

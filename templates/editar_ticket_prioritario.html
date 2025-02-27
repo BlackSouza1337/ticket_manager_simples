@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Editar' if ticket else 'Abrir' }} Ticket Prioritário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Gerenciador de Tickets Prioritários</h1>
+        </div>
+        <nav>
+            <!-- Logout e informações do usuário -->
+            <li class="user-info dropdown">
+                <a href="#" class="dropbtn">{{ current_user.username }}</a>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('alterar_senha') }}">Criar Nova Senha</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </li>
+        </nav>
+    </header>
+
+    <main>
+        <h1>{{ 'Editar' if ticket else 'Abrir' }} Ticket Prioritário</h1>
+
+        {% if not ticket %}
+        <!-- Formulário para abrir um novo ticket prioritário -->
+        <form method="POST" action="{{ url_for('salvar_ticket') }}" enctype="multipart/form-data" class="ticket-form">
+            <div class="form-group">
+                <label for="usuario">Usuário:</label>
+                <input type="text" id="usuario" name="usuario" value="{{ current_user.username }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="setor">Selecionar Setor:</label>
+                <select id="setor" name="setor" required>
+                    <option value="">Selecione um setor</option>
+                    <option value="Prioritário">Prioritário</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo_atendimento">Tipo de Atendimento:</label>
+                <select id="tipo_atendimento" name="tipo_atendimento" required>
+                    <option value="">Selecione o tipo de atendimento</option>
+                    <option value="Duvida">Dúvida</option>
+                    <option value="Erro sistema">Erro sistema</option>
+                    <option value="Problema Hardware">Problema Hardware</option>
+                    <option value="Telefone">Telefone</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição do Problema:</label>
+                <textarea id="descricao" name="descricao" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="ramal">Ramal:</label>
+                <input type="text" id="ramal" name="ramal" required>
+            </div>
+
+            <div class="form-group">
+                <label for="anexo">Anexar Arquivo Relevante (Opcional):</label>
+                <input type="file" id="anexo" name="anexo">
+            </div>
+
+            <input type="hidden" name="origem" value="prioritario">
+
+            <button type="submit" class="btn-primary">Abrir Ticket Prioritário</button>
+        </form>
+
+        {% else %}
+        <!-- Formulário para editar um ticket prioritário existente -->
+        <form method="POST" action="{{ url_for('editar_ticket_prioritario', id=ticket[0]) }}" enctype="multipart/form-data" class="ticket-form">
+            <div class="form-group">
+                <label for="usuario">Usuário:</label>
+                <input type="text" id="usuario" name="usuario" value="{{ ticket[1] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="setor">Setor:</label>
+                <input type="text" id="setor" name="setor" value="{{ ticket[2] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo_atendimento">Tipo de Atendimento:</label>
+                <input type="text" id="tipo_atendimento" name="tipo_atendimento" value="{{ ticket[3] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição do Problema:</label>
+                <textarea id="descricao" name="descricao" disabled>{{ ticket[4] }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="ramal">Ramal:</label>
+                <input type="text" id="ramal" name="ramal" value="{{ ticket[5] }}" disabled>
+            </div>
+
+            <!-- Exibir link de download se houver anexo -->
+            {% if ticket[6] and file_exists %}
+                <div class="form-group">
+                    <label>Anexo:</label>
+                    <a href="{{ url_for('download_file', filename=ticket[6]) }}" class="btn-download">
+                        ⬇️ Baixar Anexo
+                    </a>
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label>Anexo:</label>
+                    <span>Arquivo não encontrado.</span>
+                </div>
+            {% endif %}
+
+            <h2>Respostas/Atualizações</h2>
+            <ul class="updates-list">
+                {% for update in updates %}
+                <li>
+                    <strong>{{ update[5] }} ({{ update[4] }}):</strong> {{ update[3] }}
+                </li>
+                {% endfor %}
+            </ul>
+
+            <h3>Adicionar Resposta/Atualização</h3>
+            <div class="form-group">
+                <textarea name="resposta" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Alterar Status:</label>
+                <select id="status" name="status">
+                    <option value="Aberto" {% if ticket[7] == 'Aberto' %}selected{% endif %}>Aberto</option>
+                    <option value="Em andamento" {% if ticket[7] == 'Em andamento' %}selected{% endif %}>Em andamento</option>
+                    <option value="Fechado" {% if ticket[7] == 'Fechado' %}selected{% endif %}>Fechado</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Salvar Alterações</button>
+        </form>
+        {% endif %}
+
+        <a href="{{ url_for('prioritario') }}" class="btn-voltar">Voltar para a página de Tickets Prioritários</a>
+    </main>
+
+    <footer>
+    <p>&copy; 2025 Gerenciador de Tickets. Desenvolvido por 
+        <a href="https://github.com/BlackSouza1337" target="_blank" style="text-decoration: none; color: inherit;">
+            BlackSouza1337
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="16" height="16" style="vertical-align: middle; margin-left: 5px;">
+        </a>
+    </p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const alertBox = document.getElementById("alert-container");
+            if (alertBox) {
+                setTimeout(() => {
+                    alertBox.style.opacity = "0";
+                    setTimeout(() => alertBox.remove(), 500);
+                }, 3000); // Remove após 3 segundos
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo da Empresa -->
+        <img src="{{ url_for('static', filename='img/LOGO.PNG') }}" alt="Logo da Empresa" class="login-logo">
+
+        <!-- Contêiner de Mensagem de Alerta -->
+        <div id="alert-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% set category, message = messages[-1] %}  <!-- Pega apenas a última mensagem -->
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Formulário de Login -->
+        <form action="{{ url_for('login') }}" method="POST" class="login-form">
+            <div class="form-group">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Entrar</button>
+        </form>
+    </div>
+</body>
+</html>

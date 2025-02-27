@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Editar' if ticket else 'Abrir' }} Ticket</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/LOGO.PNG') }}" alt="Logo da Empresa" class="logo-img">
+            <h1>Gerenciador de Tickets</h1>
+        </div>
+        <nav>
+            <ul>
+                <!-- Ocultar "Tickets Gerais" para a Diretoria -->
+                {% if current_user.role != 'DIRETORIA' %}
+                    <li class="dropdown">
+                        <a href="#" class="dropbtn">Tickets Gerais</a>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('index') }}">Página Inicial</a>
+                            <a href="{{ url_for('abrir_ticket', origem='index') }}">Criar Ticket</a>
+                            <a href="{{ url_for('tickets_resolvidos') }}">Tickets Resolvidos</a>
+                            {% if current_user.role == 'admin' %}
+                                <a href="{{ url_for('gerenciar_usuarios') }}">Gerenciar Usuários</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
+
+                <!-- Ocultar "Tickets Prioritários" para usuários comuns (user) -->
+                {% if current_user.role != 'user' %}
+                    <li class="dropdown">
+                        <a href="#" class="dropbtn">Tickets Prioritários</a>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('abrir_ticket', origem='prioritario') }}">Criar Ticket Prioritário</a>
+                            <a href="{{ url_for('prioritario') }}">Tickets Prioritários</a>
+                            <a href="{{ url_for('tickets_resolvidos_prioritario') }}">Tickets Resolvidos Prioritários</a>
+                        </div>
+                    </li>
+                {% endif %}
+
+                <!-- Logout e informações do usuário -->
+                <li class="user-info dropdown">
+                    <a href="#" class="dropbtn">{{ current_user.username }}</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('alterar_senha') }}">Criar Nova Senha</a>
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>{{ 'Editar' if ticket else 'Abrir' }} Ticket</h1>
+
+        {% if not ticket %}
+        <!-- Formulário para abrir um novo ticket -->
+        <form method="POST" action="{{ url_for('salvar_ticket') }}" enctype="multipart/form-data" class="ticket-form">
+            <div class="form-group">
+                <label for="usuario">Usuário:</label>
+                <input type="text" id="usuario" name="usuario" value="{{ current_user.username }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="setor">Selecionar Setor:</label>
+                <select id="setor" name="setor" required>
+                    <option value="">Selecione um setor</option>
+                    <option value="Contas Médicas">Contas Médicas</option>
+                    <option value="TI">TI</option>
+                    <option value="Recepção">Recepção</option>
+                    <option value="Financeiro">Financeiro</option>
+                    <option value="Faturamento">Faturamento</option>
+                    <option value="Cadastro">Cadastro</option>
+                    <option value="Medicina preventiva">Medicina preventiva</option>
+                    <option value="Medilar">Medilar</option>
+                    <option value="CAC">CAC</option>
+                    <option value="Intercambio">Intercâmbio</option>
+                    <option value="Auditoria Enfermagem">Auditoria Enfermagem</option>
+                    <option value="Auditoria Médica">Auditoria Médica</option>
+                    <option value="PABX">PABX</option>
+                    <option value="Gerencia">Gerência</option>
+                    <option value="Diretoria">Diretoria</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo_atendimento">Tipo de Atendimento:</label>
+                <select id="tipo_atendimento" name="tipo_atendimento" required>
+                    <option value="">Selecione o tipo de atendimento</option>
+                    <option value="Duvida">Dúvida</option>
+                    <option value="Erro sistema">Erro sistema</option>
+                    <option value="Problema Hardware">Problema Hardware</option>
+                    <option value="Telefone">Telefone</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição do Problema:</label>
+                <textarea id="descricao" name="descricao" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="ramal">Ramal:</label>
+                <input type="text" id="ramal" name="ramal" required>
+            </div>
+
+            <div class="form-group">
+                <label for="prioridade">Prioridade:</label>
+                <select id="prioridade" name="prioridade" required>
+                    <option value="Baixo">Baixo</option>
+                    <option value="Médio">Médio</option>
+                    <option value="Alto">Alto</option>
+                    <option value="Urgente">Urgente</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="anexo">Anexar Arquivo Relevante (Opcional):</label>
+                <input type="file" id="anexo" name="anexo">
+            </div>
+
+            <button type="submit" class="btn-primary">Abrir Ticket</button>
+        </form>
+
+        {% else %}
+        <!-- Formulário para editar um ticket existente -->
+        <form method="POST" action="{{ url_for('editar_ticket', id=ticket[0]) }}" enctype="multipart/form-data" class="ticket-form">
+            <div class="form-group">
+                <label for="usuario">Usuário:</label>
+                <input type="text" id="usuario" name="usuario" value="{{ ticket[1] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="setor">Setor:</label>
+                <input type="text" id="setor" name="setor" value="{{ ticket[2] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="tipo_atendimento">Tipo de Atendimento:</label>
+                <input type="text" id="tipo_atendimento" name="tipo_atendimento" value="{{ ticket[3] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição do Problema:</label>
+                <textarea id="descricao" name="descricao" disabled>{{ ticket[4] }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="ramal">Ramal:</label>
+                <input type="text" id="ramal" name="ramal" value="{{ ticket[5] }}" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="prioridade">Prioridade:</label>
+                <select id="prioridade" name="prioridade" {% if current_user.role != 'admin' %}disabled{% endif %}>
+                    <option value="Baixo" {% if ticket[8] == 'Baixo' %}selected{% endif %}>Baixo</option>
+                    <option value="Médio" {% if ticket[8] == 'Médio' %}selected{% endif %}>Médio</option>
+                    <option value="Alto" {% if ticket[8] == 'Alto' %}selected{% endif %}>Alto</option>
+                    <option value="Urgente" {% if ticket[8] == 'Urgente' %}selected{% endif %}>Urgente</option>
+                </select>
+            </div>
+
+            <!-- Exibir link de download se houver anexo -->
+            {% if ticket[6] and file_exists %}
+                <div class="form-group">
+                    <label>Anexo:</label>
+                    <a href="{{ url_for('download_file', filename=ticket[6]) }}" class="btn-download">
+                        ⬇️ Baixar Anexo
+                    </a>
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label>Anexo:</label>
+                    <span>Arquivo não encontrado.</span>
+                </div>
+            {% endif %}
+
+            <h2>Respostas/Atualizações</h2>
+            <ul class="updates-list">
+                {% for update in updates %}
+                <li>
+                    <strong>{{ update[5] }} ({{ update[4] }}):</strong> {{ update[3] }}
+                </li>
+                {% endfor %}
+            </ul>
+
+            <h3>Adicionar Resposta/Atualização</h3>
+            <div class="form-group">
+                <textarea name="resposta" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Alterar Status:</label>
+                <select id="status" name="status">
+                    <option value="Aberto" {% if ticket[7] == 'Aberto' %}selected{% endif %}>Aberto</option>
+                    <option value="Em andamento" {% if ticket[7] == 'Em andamento' %}selected{% endif %}>Em andamento</option>
+                    <option value="Fechado" {% if ticket[7] == 'Fechado' %}selected{% endif %}>Fechado</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Salvar Alterações</button>
+        </form>
+        {% endif %}
+
+        <a href="{{ url_for('index') }}" class="btn-voltar">Voltar para a página inicial</a>
+    </main>
+
+    <footer>
+    <p>&copy; 2025 Gerenciador de Tickets. Desenvolvido por 
+        <a href="https://github.com/BlackSouza1337" target="_blank" style="text-decoration: none; color: inherit;">
+            BlackSouza1337
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="16" height="16" style="vertical-align: middle; margin-left: 5px;">
+        </a>
+    </p>
+</footer>
+</body>
+</html>
