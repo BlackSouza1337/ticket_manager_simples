@@ -443,9 +443,10 @@ def editar_ticket(id):
             return redirect(url_for('index'))
 
         # Verificar permissões
-        if current_user.username != ticket[1] and current_user.role != 'admin':
+        if current_user.username != ticket[1] and current_user.role not in ['admin', 'user']:
             flash('Acesso negado. Você não tem permissão para editar este ticket.', 'error')
             return redirect(url_for('index'))
+            
 
         # Buscar atualizações/respostas do ticket com o nome do usuário
         cursor.execute('''
@@ -523,7 +524,7 @@ def editar_ticket_prioritario(id):
             return redirect(url_for('prioritario'))
 
         # Verificar permissões
-        if current_user.username != ticket[1] and current_user.role != 'admin':
+        if current_user.username != ticket[1] and current_user.role not in ['admin', 'diretoria']:
             flash('Acesso negado. Você não tem permissão para editar este ticket.', 'error')
             return redirect(url_for('prioritario'))
 
@@ -684,7 +685,7 @@ def prioritario():
 @app.route('/ticket_prioritario/<int:id>', methods=['GET', 'POST'])
 @login_required
 def ticket_prioritario(id):
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'DIRETORIA']:
         flash('Acesso negado. Somente ADMINS podem editar tickets prioritários.', 'error')
         return redirect(url_for('prioritario'))
 
@@ -701,7 +702,7 @@ def ticket_prioritario(id):
             return redirect(url_for('prioritario'))
 
         # Verificar permissões
-        if current_user.username != ticket[1] and current_user.role != 'admin':
+        if current_user.username != ticket[1] and current_user.role not in ['admin', 'DIRETORIA']:
             flash('Acesso negado. Você não tem permissão para editar este ticket.', 'error')
             return redirect(url_for('prioritario'))
 
