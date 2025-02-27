@@ -1,6 +1,8 @@
 # Gerenciador de Chamados Simples
 
-Um sistema de gerenciamento de tickets (chamados) desenvolvido em Python e HTML, voltado para pequenas empresas que não possuem condições de adquirir uma plataforma de gerenciamento de chamados profissional. O sistema é simples, mas funcional, e permite a abertura de tickets normais e prioritários, com notificações por e-mail e gerenciamento de usuários.
+Um sistema de gerenciamento de tickets (chamados) desenvolvido em Python e HTML.
+Voltado para pequenas empresas que não possuem condições de adquirir uma plataforma de gerenciamento de chamados profissional. 
+O sistema é simples, mas funcional, e permite a abertura de tickets normais e prioritários, com notificações por e-mail e gerenciamento de usuários.
 
 ## 🚀 Funcionalidades
 
